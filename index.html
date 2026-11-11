@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Acesso ao Portal CHEGA.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <title>Portal CHEGA</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
+    body{display:flex;flex-direction:column}
+    header{height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#000;border-bottom:1px solid #333}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+    .brand img{width:44px;height:44px;object-fit:contain}
+    .actions{display:flex;gap:8px}
+    a,button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:10px 13px;text-decoration:none;cursor:pointer}
+    .open{background:#fff;color:#000}
+    .install{background:#d9ad28;color:#000}
+    main{position:relative;flex:1;min-height:0;background:#fff}
+    iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+    .fallback{position:absolute;left:12px;right:12px;bottom:12px;padding:12px;border-radius:10px;background:#111;color:#fff;text-align:center;font-size:13px;opacity:.94}
+    .fallback a{display:inline-block;margin-left:8px;background:#fff;color:#000}
+    @media(max-width:420px){header{padding:7px 9px}.brand span{font-size:14px}.brand img{width:38px;height:38px}.actions a,.actions button{padding:9px 10px;font-size:12px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><img src="./icons/icon-192.png" alt=""><span>Portal CHEGA</span></div>
+    <div class="actions">
+      <button class="install" id="install" hidden>Instalar</button>
+      <a class="open" href="https://portalchega.pt/" target="_blank" rel="noopener">Abrir portal</a>
+    </div>
+  </header>
+  <main>
+    <iframe src="https://portalchega.pt/" title="Portal CHEGA"></iframe>
+    <div class="fallback">Se o portal não aparecer nesta janela, abre-o directamente.
+      <a href="https://portalchega.pt/">Abrir Portal CHEGA</a>
+    </div>
+  </main>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+    }
+    let deferredPrompt;
+    const installButton = document.getElementById("install");
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installButton.hidden = false;
+    });
+    installButton.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installButton.hidden = true;
+    });
+  </script>
+</body>
+</html>
